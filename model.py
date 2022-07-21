@@ -1,8 +1,11 @@
+#! /usr/bin/env python3
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import os
+from constants import MODEL_FOLDER_PATH, MODEL_FILE_NAME
 
 
 class Linear_QNet(nn.Module):
@@ -16,13 +19,21 @@ class Linear_QNet(nn.Module):
         x = self.linear2(x)
         return x
 
-    def save(self, file_name="model.pt"):
-        model_folder_path = "./model"
-        if not os.path.exists(model_folder_path):
-            os.makedirs(model_folder_path)
+    def save(self, file_name=MODEL_FILE_NAME):
+        if not os.path.exists(MODEL_FOLDER_PATH):
+            os.makedirs(MODEL_FOLDER_PATH)
 
-        file_name = os.path.join(model_folder_path, file_name)
+        file_name = os.path.join(MODEL_FOLDER_PATH, file_name)
         torch.save(self.state_dict(), file_name)
+
+    def load(self, file_name=MODEL_FILE_NAME):
+        file_name = os.path.join(MODEL_FOLDER_PATH, file_name)
+
+        if os.path.exists(file_name):
+            print("Load existing state_dict")
+
+            self.load_state_dict(torch.load(file_name))
+            self.eval()
 
 
 class QTrainer:
